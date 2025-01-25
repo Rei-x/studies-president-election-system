@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CandidateCard } from "@/components/CandidateCard";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import type * as React from "react";
 import { ChevronRight, FileCheck } from "lucide-react";
 import { NavigationBar } from "@/components/NavigationBar";
+import { hasUserVoted } from "@/utils/voteStorage";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Candidate {
   id: string;
@@ -37,6 +38,18 @@ const candidates: Candidate[] = [
 const Vote = () => {
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (hasUserVoted()) {
+      toast({
+        title: "Już oddałeś głos",
+        description: "Nie możesz głosować więcej niż jeden raz.",
+        variant: "destructive",
+      });
+      navigate("/dashboard");
+    }
+  }, [navigate, toast]);
 
   const handleContinue = () => {
     if (selectedCandidate) {

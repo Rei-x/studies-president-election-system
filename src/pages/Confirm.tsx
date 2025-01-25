@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { NavigationBar } from "@/components/NavigationBar";
+import { saveVote } from "@/utils/voteStorage";
 
 const Confirm = () => {
   const location = useLocation();
@@ -11,9 +12,13 @@ const Confirm = () => {
   const candidateId = location.state?.candidateId;
 
   const handleConfirm = () => {
+    const referenceNumber = Math.random().toString(36).substring(2, 15);
+    // For this example, we'll use a hardcoded userId. In a real app, this would come from authentication
+    const userId = "user123";
+    saveVote(userId, candidateId, referenceNumber);
     navigate("/success", {
       state: {
-        referenceNumber: Math.random().toString(36).substring(2, 15),
+        referenceNumber,
       },
     });
   };
@@ -66,11 +71,15 @@ const Confirm = () => {
                 decyzji!
               </p>
               <div className="flex justify-center gap-4 pt-4">
-                <Button variant="outline" className="w-32">
+                <Button 
+                  variant="outline" 
+                  className="w-32"
+                  onClick={() => navigate("/vote")}
+                >
                   Anuluj
                 </Button>
                 <Button
-                  onClick={() => handleConfirm()}
+                  onClick={handleConfirm}
                   className="w-32"
                   variant="default"
                 >

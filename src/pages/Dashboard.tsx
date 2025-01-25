@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Vote } from "lucide-react";
 import { NavigationBar } from "@/components/NavigationBar";
+import { hasUserVoted, getUserVote } from "@/utils/voteStorage";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const userHasVoted = hasUserVoted();
+  const userVote = getUserVote();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -24,16 +27,29 @@ const Dashboard = () => {
             </div>
 
             <div className="space-y-4">
-              <p className="text-gray-600">
-                Głosuj teraz i miej wpływ na losy kraju!
-              </p>
-              <Button
-                onClick={() => navigate("/vote")}
-                size="lg"
-                className="w-full sm:w-auto text-lg"
-              >
-                Głosuj teraz!
-              </Button>
+              {userHasVoted ? (
+                <div className="space-y-2">
+                  <p className="text-green-600 font-medium">
+                    Oddałeś już swój głos!
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Nr referencyjny: {userVote?.referenceNumber}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-gray-600">
+                    Głosuj teraz i miej wpływ na losy kraju!
+                  </p>
+                  <Button
+                    onClick={() => navigate("/vote")}
+                    size="lg"
+                    className="w-full sm:w-auto text-lg"
+                  >
+                    Głosuj teraz!
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
