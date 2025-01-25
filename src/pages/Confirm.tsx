@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { NavigationBar } from "@/components/NavigationBar";
 
 const Confirm = () => {
   const location = useLocation();
@@ -10,10 +11,10 @@ const Confirm = () => {
   const candidateId = location.state?.candidateId;
 
   const handleConfirm = () => {
-    navigate("/success", { 
-      state: { 
-        referenceNumber: Math.random().toString(36).substring(2, 15) 
-      } 
+    navigate("/success", {
+      state: {
+        referenceNumber: Math.random().toString(36).substring(2, 15),
+      },
     });
   };
 
@@ -32,34 +33,50 @@ const Confirm = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 bg-gradient-to-b from-background to-muted">
-      <div className="max-w-2xl mx-auto space-y-8 pt-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Confirm Your Vote</h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            Please review your selection before confirming
-          </p>
-        </div>
-
-        <Card className="glass-panel">
-          <CardHeader>
-            <CardTitle>Your Selection</CardTitle>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+      <NavigationBar />
+      <div className="flex items-center justify-center p-4">
+        <Card className="w-full max-w-xl">
+          <CardHeader className="text-center space-y-1">
+            <CardTitle className="text-2xl font-semibold">
+              Głosowanie na prezydenta 202x
+            </CardTitle>
+            <div className="text-sm text-muted-foreground">
+              <div>Status: Aktywne</div>
+              <div>Zamyka się: xx.xx.xxxx xxxx</div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <Alert>
-              <AlertTitle>Important</AlertTitle>
-              <AlertDescription>
-                Once confirmed, your vote cannot be changed.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="flex justify-end space-x-4 mt-6">
-              <Button variant="outline" onClick={() => navigate("/vote")}>
-                Back
-              </Button>
-              <Button onClick={handleConfirm}>
-                Confirm Vote
-              </Button>
+          <CardContent className="space-y-8">
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-center">
+                Podsumowanie wyboru
+              </h2>
+              <p className="text-center text-lg">
+                Twój wybór:{" "}
+                <span className="font-medium">Brak (głos nieważny)</span>
+              </p>
+            </div>
+
+            <div className="space-y-4 text-center">
+              <h3 className="text-lg font-medium">
+                Czy na pewno chcesz oddać głos?
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Po potwierdzeniu oddania głosu, nie będziesz już mógł zmienić
+                decyzji!
+              </p>
+              <div className="flex justify-center gap-4 pt-4">
+                <Button variant="outline" className="w-32">
+                  Anuluj
+                </Button>
+                <Button
+                  onClick={() => handleConfirm()}
+                  className="w-32"
+                  variant="default"
+                >
+                  Potwierdź
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

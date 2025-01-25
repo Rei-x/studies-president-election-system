@@ -2,15 +2,40 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CandidateCard } from "@/components/CandidateCard";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type * as React from "react";
+import { ChevronRight, FileCheck } from "lucide-react";
+import { NavigationBar } from "@/components/NavigationBar";
 
-const candidates = [
-  { id: 1, name: "John Smith", party: "Progressive Party" },
-  { id: 2, name: "Sarah Johnson", party: "Conservative Party" },
-  { id: 3, name: "Michael Brown", party: "Liberal Party" },
+interface Candidate {
+  id: string;
+  name: string;
+  description: string;
+}
+
+const candidates: Candidate[] = [
+  {
+    id: "1",
+    name: "Jan Kowalski",
+    description:
+      "Moim planem wyborczym jest rozwój infrastruktury i poprawa jakości życia mieszkańców...",
+  },
+  {
+    id: "2",
+    name: "Jan Kowalski",
+    description:
+      "Moim planem wyborczym jest rozwój infrastruktury i poprawa jakości życia mieszkańców...",
+  },
+  {
+    id: "3",
+    name: "Jan Kowalski",
+    description:
+      "Moim planem wyborczym jest rozwój infrastruktury i poprawa jakości życia mieszkańców...",
+  },
 ];
 
 const Vote = () => {
-  const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<string>("");
   const navigate = useNavigate();
 
   const handleContinue = () => {
@@ -20,40 +45,79 @@ const Vote = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-gradient-to-b from-background to-muted">
-      <div className="max-w-4xl mx-auto space-y-8 pt-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Cast Your Vote</h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            Select your preferred candidate
+    <>
+      <NavigationBar />
+
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-semibold mb-1">
+            Głosowanie na prezydenta 202x
+          </h1>
+          <p className="text-muted-foreground">Status: Aktywne</p>
+          <p className="text-sm text-muted-foreground">
+            Zamyka się xx.xx.xxxx 20:xx
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {candidates.map((candidate) => (
-            <CandidateCard
-              key={candidate.id}
-              name={candidate.name}
-              party={candidate.party}
-              selected={selectedCandidate === candidate.id}
-              onSelect={() => setSelectedCandidate(candidate.id)}
-            />
-          ))}
-        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <RadioGroup
+              value={selectedCandidate}
+              onValueChange={setSelectedCandidate}
+            >
+              {candidates.map((candidate) => (
+                <label
+                  key={candidate.id}
+                  className="flex items-center space-x-2 rounded-lg bg-muted p-4 cursor-pointer hover:bg-muted/80 transition-colors"
+                >
+                  <RadioGroupItem
+                    value={candidate.id}
+                    id={candidate.id}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-medium">{candidate.name}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {candidate.description}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </label>
+              ))}
+            </RadioGroup>
+          </div>
 
-        <div className="flex justify-end space-x-4">
-          <Button variant="outline" onClick={() => navigate("/dashboard")}>
-            Back
-          </Button>
-          <Button 
-            onClick={handleContinue}
-            disabled={!selectedCandidate}
-          >
-            Continue
-          </Button>
+          <div className="relative rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 p-8">
+            <div className="flex flex-col items-center justify-center space-y-6">
+              <FileCheck className="h-20 w-20 text-muted-foreground" />
+              <div className="text-center">
+                <p className="mb-6">
+                  Twój wybór:{" "}
+                  {selectedCandidate
+                    ? candidates.find((c) => c.id === selectedCandidate)?.name
+                    : "Brak (głos nieważny)"}
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedCandidate("")}
+                  >
+                    Anuluj
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      handleContinue();
+                    }}
+                  >
+                    Dalej
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

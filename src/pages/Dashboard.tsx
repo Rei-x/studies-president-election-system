@@ -2,45 +2,50 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Vote } from "lucide-react";
+import { NavigationBar } from "@/components/NavigationBar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen p-4 bg-gradient-to-b from-background to-muted">
-      <div className="max-w-4xl mx-auto space-y-8 pt-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Welcome to the Voting System</h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            Your voice matters - cast your vote today
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50">
+      <NavigationBar />
 
-        <Card className="glass-panel">
-          <CardHeader>
-            <CardTitle>Election Status</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <main className="container mx-auto px-4 py-12 md:py-24">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+          <div className="space-y-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">
+              Witaj w systemie głosowania na Prezydenta RP!
+            </h1>
+
+            <div className="space-y-4 text-gray-600">
+              <p>Bezpieczny, szybki i przejrzysty sposób na oddanie głosu.</p>
+              <p>Twoja decyzja ma znaczenie – zdecyduj o przyszłości!</p>
+            </div>
+
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span>Status:</span>
-                <span className="text-green-600 font-medium">Active</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Closing Date:</span>
-                <span>December 31, 2024</span>
-              </div>
-              <Button 
-                className="w-full mt-4"
+              <p className="text-gray-600">
+                Głosuj teraz i miej wpływ na losy kraju!
+              </p>
+              <Button
                 onClick={() => navigate("/vote")}
+                size="lg"
+                className="w-full sm:w-auto text-lg"
               >
-                <Vote className="mr-2 h-4 w-4" />
-                Start Voting
+                Głosuj teraz!
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+
+          <div className="relative h-[400px] lg:h-[500px]">
+            <img
+              src={`/image.png`}
+              alt="Ilustracja głosowania"
+              className="object-contain"
+            />
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
