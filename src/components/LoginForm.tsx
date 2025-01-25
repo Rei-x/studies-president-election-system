@@ -14,19 +14,19 @@ export const LoginForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const user = authenticateUser(login, password);
-    
+
     if (user) {
       setLoggedInUser(user);
       toast({
-        title: "Login successful",
-        description: `Welcome ${user.name}`,
+        title: "Sukces",
+        description: `Witaj ${user.name}`,
       });
       navigate("/dashboard");
     } else {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Invalid login credentials",
+        description: "Złe dane logowania",
       });
     }
   };
