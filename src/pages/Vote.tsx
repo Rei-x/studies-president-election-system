@@ -1,39 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CandidateCard } from "@/components/CandidateCard";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronRight, FileCheck } from "lucide-react";
 import { NavigationBar } from "@/components/NavigationBar";
 import { hasUserVoted } from "@/utils/voteStorage";
 import { useToast } from "@/components/ui/use-toast";
-
-interface Candidate {
-  id: string;
-  name: string;
-  description: string;
-}
-
-const candidates: Candidate[] = [
-  {
-    id: "1",
-    name: "Jan Kowalski",
-    description:
-      "Moim planem wyborczym jest rozwój infrastruktury i poprawa jakości życia mieszkańców...",
-  },
-  {
-    id: "2",
-    name: "Jan Kowalski",
-    description:
-      "Moim planem wyborczym jest rozwój infrastruktury i poprawa jakości życia mieszkańców...",
-  },
-  {
-    id: "3",
-    name: "Jan Kowalski",
-    description:
-      "Moim planem wyborczym jest rozwój infrastruktury i poprawa jakości życia mieszkańców...",
-  },
-];
+import { candidates } from "@/lib/candidates";
 
 const Vote = () => {
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");

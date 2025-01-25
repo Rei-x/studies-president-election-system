@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { NavigationBar } from "@/components/NavigationBar";
 import { saveVote } from "@/utils/voteStorage";
 import { getLoggedInUser } from "@/utils/auth";
+import { candidates } from "@/lib/candidates";
 
 const Confirm = () => {
   const location = useLocation();
@@ -59,7 +60,11 @@ const Confirm = () => {
               </h2>
               <p className="text-center text-lg">
                 Twój wybór:{" "}
-                <span className="font-medium">Brak (głos nieważny)</span>
+                <span className="font-medium">
+                  {candidateId
+                    ? candidates.find((c) => c.id === candidateId).name
+                    : `Brak (głos nieważny)`}
+                </span>
               </p>
             </div>
 
