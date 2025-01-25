@@ -3,26 +3,30 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { authenticateUser, setLoggedInUser } from "@/utils/auth";
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
+    const user = authenticateUser(login, password);
+    
+    if (user) {
+      setLoggedInUser(user);
       toast({
         title: "Login successful",
-        description: "Welcome to the voting system",
+        description: `Welcome ${user.name}`,
       });
       navigate("/dashboard");
     } else {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Invalid login credentials",
       });
     }
   };
@@ -43,7 +47,8 @@ export const LoginForm = () => {
           <Input
             id="login"
             placeholder="Login"
-            onChange={(e) => setEmail(e.target.value)}
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
             type="text"
             className="h-11 bg-gray-100/80"
           />
@@ -52,6 +57,7 @@ export const LoginForm = () => {
           <Input
             id="password"
             placeholder="Hasło"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             className="h-11 bg-gray-100/80"
