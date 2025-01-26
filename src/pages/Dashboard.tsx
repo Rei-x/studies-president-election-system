@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Vote, FileText, Database } from "lucide-react";
+import { Vote, FileText, Database, Settings } from "lucide-react";
 import { NavigationBar } from "@/components/NavigationBar";
-import { hasUserVoted, getUserVote } from "@/utils/voteStorage";
+import { getUserVote } from "@/utils/voteStorage";
 import {
   getLoggedInUser,
   canUserVote,
@@ -12,13 +12,25 @@ import {
 } from "@/utils/auth";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useVotings } from "@/hooks/use-votings";
+import type { Voting } from "@/atoms/votings";
+
+const findActiveVoting = (votings: Voting[]) => {
+  const now = new Date();
+  return votings.find((voting) => {
+    const startDate = new Date(voting.startDate);
+    const endDate = new Date(voting.endDate);
+    return now >= startDate && now <= endDate;
+  });
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const userHasVoted = hasUserVoted();
-  const userVote = getUserVote();
   const currentUser = getLoggedInUser();
-  const { toast } = useToast();
+  const [votings] = useVotings();
+  const currentVoting = findActiveVoting(votings);
+
+  const hasVoted = !!(currentUser && currentVoting?.userVotes[currentUser.id]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -42,23 +54,27 @@ const Dashboard = () => {
               {canUserVote(currentUser) && (
                 <Card className="p-6 space-y-4">
                   <h2 className="text-xl font-semibold">Głosowanie</h2>
-                  {userHasVoted ? (
-                    <div className="space-y-2">
-                      <p className="text-green-600 font-medium">
-                        Oddałeś już swój głos!
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Nr referencyjny: {userVote?.referenceNumber}
-                      </p>
-                    </div>
+                  {currentVoting ? (
+                    hasVoted ? (
+                      <div className="space-y-2">
+                        <p className="text-green-600 font-medium">
+                          Dziękujemy za oddanie głosu!
+                        </p>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => navigate("/vote")}
+                        className="w-full"
+                        disabled={!currentVoting || hasVoted}
+                      >
+                        <Vote className="mr-2" />
+                        Oddaj głos
+                      </Button>
+                    )
                   ) : (
-                    <Button
-                      onClick={() => navigate("/vote")}
-                      className="w-full"
-                    >
-                      <Vote className="mr-2" />
-                      Głosuj teraz
-                    </Button>
+                    <p className="text-sm text-gray-500">
+                      Aktualnie nie ma aktywnego głosowania
+                    </p>
                   )}
                 </Card>
               )}
@@ -77,18 +93,33 @@ const Dashboard = () => {
               )}
 
               {isAdmin(currentUser) && (
-                <Card className="p-6 space-y-4">
-                  <h2 className="text-xl font-semibold">
-                    Zarządzanie systemem
-                  </h2>
-                  <Button
-                    onClick={() => navigate("/backup-config")}
-                    className="w-full"
-                  >
-                    <Database className="mr-2" />
-                    Kopie zapasowe
-                  </Button>
-                </Card>
+                <>
+                  <Card className="p-6 space-y-4">
+                    <h2 className="text-xl font-semibold">
+                      Zarządzanie głosowaniami
+                    </h2>
+                    <Button
+                      onClick={() => navigate("/vote-management")}
+                      className="w-full"
+                    >
+                      <Settings className="mr-2" />
+                      Zarządzaj głosowaniami
+                    </Button>
+                  </Card>
+
+                  <Card className="p-6 space-y-4">
+                    <h2 className="text-xl font-semibold">
+                      Zarządzanie systemem
+                    </h2>
+                    <Button
+                      onClick={() => navigate("/backup-config")}
+                      className="w-full"
+                    >
+                      <Database className="mr-2" />
+                      Kopie zapasowe
+                    </Button>
+                  </Card>
+                </>
               )}
             </div>
           </div>

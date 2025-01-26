@@ -50,6 +50,9 @@ export default function VotingInterface() {
             <Card
               key={voting.title}
               className="p-4 hover:bg-accent transition-colors cursor-pointer"
+              onClick={() =>
+                navigate(`/edit-voting/${encodeURIComponent(voting.title)}`)
+              }
             >
               <div className="flex items-center justify-between">
                 <div className="space-y-1.5">

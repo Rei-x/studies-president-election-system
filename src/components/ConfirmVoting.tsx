@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface ConfirmVotingProps {
-  mode: "create" | "delete";
+  mode: "create" | "delete" | "edit";
   votingName: string;
   description: string;
   startDate: string;
@@ -22,10 +22,11 @@ export default function ConfirmVoting({
   onConfirm,
   onCancel,
 }: ConfirmVotingProps) {
-  const title =
-    mode === "create"
-      ? "Potwierdź dodanie głosowania"
-      : "Czy na pewno chcesz usunąć to głosowanie?";
+  const title = {
+    create: "Potwierdź dodanie głosowania",
+    delete: "Czy na pewno chcesz usunąć to głosowanie?",
+    edit: "Potwierdź edycję głosowania",
+  }[mode];
 
   return (
     <Card
@@ -86,7 +87,7 @@ export default function ConfirmVoting({
             onClick={onConfirm}
             variant={mode === "delete" ? "destructive" : "default"}
           >
-            {mode === "create" ? "Potwierdź" : "Usuń"}
+            {mode === "delete" ? "Usuń" : "Potwierdź"}
           </Button>
         </div>
       </div>

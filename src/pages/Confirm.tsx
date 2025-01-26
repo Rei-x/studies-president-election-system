@@ -4,35 +4,59 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { NavigationBar } from "@/components/NavigationBar";
-import { saveVote } from "@/utils/voteStorage";
+
 import { getLoggedInUser } from "@/utils/auth";
-import { candidates } from "@/lib/candidates";
+import { useVotings } from "@/hooks/use-votings";
+import type { Voting } from "@/atoms/votings";
+
+const findActiveVoting = (votings: Voting[]) => {
+  const now = new Date();
+  return votings.find((voting) => {
+    const startDate = new Date(voting.startDate);
+    const endDate = new Date(voting.endDate);
+    return now >= startDate && now <= endDate;
+  });
+};
 
 const Confirm = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const candidateId = location.state?.candidateId;
+  const [votings, setVotings] = useVotings();
+  const currentVoting = findActiveVoting(votings);
+  const candidateName = location.state?.candidateId;
 
   const handleConfirm = () => {
     const referenceNumber = Math.random().toString(36).substring(2, 15);
-    // For this example, we'll use a hardcoded userId. In a real app, this would come from authentication
-    const userId = getLoggedInUser().id;
-    saveVote(userId, candidateId, referenceNumber);
+    const userId = getLoggedInUser()?.id;
+
+    if (!userId || !currentVoting) {
+      navigate("/dashboard");
+      return;
+    }
+
+    setVotings((votings) => {
+      const vote = findActiveVoting(votings);
+
+      vote.userVotes[userId] = referenceNumber;
+      vote.votes[referenceNumber] = candidateName;
+    });
     navigate("/success", {
       state: {
         referenceNumber,
+        votingTitle: currentVoting.title,
       },
     });
   };
 
-  if (!candidateId) {
+  if (!candidateName || !currentVoting) {
     return (
       <div className="min-h-screen p-4 flex items-center justify-center">
         <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
-            No candidate selected. Please return to the voting page.
+            No candidate selected or no active voting. Please return to the
+            voting page.
           </AlertDescription>
         </Alert>
       </div>
@@ -46,11 +70,18 @@ const Confirm = () => {
         <Card className="w-full max-w-xl">
           <CardHeader className="text-center space-y-1">
             <CardTitle className="text-2xl font-semibold">
-              Głosowanie na prezydenta 202x
+              {currentVoting.title}
             </CardTitle>
             <div className="text-sm text-muted-foreground">
-              <div>Status: Aktywne</div>
-              <div>Zamyka się: xx.xx.xxxx xxxx</div>
+              <div>
+                Status:{" "}
+                {new Date(currentVoting.endDate) > new Date()
+                  ? "Aktywne"
+                  : "Zakończone"}
+              </div>
+              <div>
+                Zamyka się: {new Date(currentVoting.endDate).toLocaleString()}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-8">
@@ -61,9 +92,7 @@ const Confirm = () => {
               <p className="text-center text-lg">
                 Twój wybór:{" "}
                 <span className="font-medium">
-                  {candidateId
-                    ? candidates.find((c) => c.id === candidateId).name
-                    : `Brak (głos nieważny)`}
+                  {candidateName || "Brak (głos nieważny)"}
                 </span>
               </p>
             </div>

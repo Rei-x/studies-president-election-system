@@ -165,6 +165,7 @@ export default function AddVoting() {
         .filter((c) => c.name.trim())
         .map(({ id, ...rest }) => rest),
       votes: existingVoting?.votes || {},
+      userVotes: {},
     };
 
     setValidatedVoting(votingData);
@@ -196,7 +197,7 @@ export default function AddVoting() {
       {showConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <ConfirmVoting
-            mode="create"
+            mode={existingVoting ? "edit" : "create"}
             votingName={validatedVoting.title}
             description={validatedVoting.description}
             startDate={validatedVoting.startDate}

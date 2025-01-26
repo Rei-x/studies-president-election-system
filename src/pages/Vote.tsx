@@ -4,18 +4,41 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronRight, FileCheck } from "lucide-react";
 import { NavigationBar } from "@/components/NavigationBar";
-import { hasUserVoted } from "@/utils/voteStorage";
+
 import { useToast } from "@/components/ui/use-toast";
-import { candidates } from "@/lib/candidates";
 import { getLoggedInUser, canUserVote } from "@/utils/auth";
+import { useVotings } from "@/hooks/use-votings";
+import type { Voting } from "@/atoms/votings";
+
+const findActiveVoting = (votings: Voting[]) => {
+  const now = new Date();
+  return votings.find((voting) => {
+    const startDate = new Date(voting.startDate);
+    const endDate = new Date(voting.endDate);
+    return now >= startDate && now <= endDate;
+  });
+};
 
 const Vote = () => {
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
   const currentUser = getLoggedInUser();
+  const [votings] = useVotings();
+
+  const currentVoting = findActiveVoting(votings);
 
   useEffect(() => {
+    if (!currentVoting) {
+      toast({
+        title: "Błąd",
+        description: "Nie znaleziono aktywnego głosowania.",
+        variant: "destructive",
+      });
+      navigate("/dashboard");
+      return;
+    }
+
     if (!currentUser || !canUserVote(currentUser)) {
       toast({
         title: "Brak dostępu",
@@ -25,35 +48,35 @@ const Vote = () => {
       navigate("/dashboard");
       return;
     }
-
-    if (hasUserVoted()) {
-      toast({
-        title: "Już oddałeś głos",
-        description: "Nie możesz głosować więcej niż jeden raz.",
-        variant: "destructive",
-      });
-      navigate("/dashboard");
-    }
-  }, [navigate, toast, currentUser]);
+  }, [navigate, toast, currentUser, currentVoting]);
 
   const handleContinue = () => {
     if (selectedCandidate) {
-      navigate("/confirm", { state: { candidateId: selectedCandidate } });
+      navigate("/confirm", {
+        state: {
+          candidateId: selectedCandidate,
+          votingTitle: currentVoting?.title,
+        },
+      });
     }
   };
+
+  if (!currentVoting) return null;
 
   return (
     <>
       <NavigationBar />
-
       <div className="mx-auto max-w-5xl px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold mb-1">
-            Głosowanie na prezydenta 202x
-          </h1>
-          <p className="text-muted-foreground">Status: Aktywne</p>
+          <h1 className="text-2xl font-semibold mb-1">{currentVoting.title}</h1>
+          <p className="text-muted-foreground">
+            Status:{" "}
+            {new Date(currentVoting.endDate) > new Date()
+              ? "Aktywne"
+              : "Zakończone"}
+          </p>
           <p className="text-sm text-muted-foreground">
-            Zamyka się xx.xx.xxxx 20:xx
+            Zamyka się {new Date(currentVoting.endDate).toLocaleString()}
           </p>
         </div>
 
@@ -63,14 +86,14 @@ const Vote = () => {
               value={selectedCandidate}
               onValueChange={setSelectedCandidate}
             >
-              {candidates.map((candidate) => (
+              {currentVoting.candidates.map((candidate) => (
                 <label
-                  key={candidate.id}
+                  key={candidate.name}
                   className="flex items-center space-x-2 rounded-lg bg-muted p-4 cursor-pointer hover:bg-muted/80 transition-colors"
                 >
                   <RadioGroupItem
-                    value={candidate.id}
-                    id={candidate.id}
+                    value={candidate.name}
+                    id={candidate.name}
                     className="mt-1"
                   />
                   <div className="flex-1">
@@ -90,10 +113,7 @@ const Vote = () => {
               <FileCheck className="h-20 w-20 text-muted-foreground" />
               <div className="text-center">
                 <p className="mb-6">
-                  Twój wybór:{" "}
-                  {selectedCandidate
-                    ? candidates.find((c) => c.id === selectedCandidate)?.name
-                    : "Brak (głos nieważny)"}
+                  Twój wybór: {selectedCandidate || "Brak (głos nieważny)"}
                 </p>
                 <div className="flex justify-center space-x-4">
                   <Button
@@ -102,9 +122,7 @@ const Vote = () => {
                   >
                     Anuluj
                   </Button>
-                  <Button onClick={handleContinue}>
-                    Dalej
-                  </Button>
+                  <Button onClick={handleContinue}>Dalej</Button>
                 </div>
               </div>
             </div>
