@@ -4,7 +4,12 @@ import { Card } from "@/components/ui/card";
 import { Vote, FileText, Database } from "lucide-react";
 import { NavigationBar } from "@/components/NavigationBar";
 import { hasUserVoted, getUserVote } from "@/utils/voteStorage";
-import { getLoggedInUser, canUserVote, canUserReport, isAdmin } from "@/utils/auth";
+import {
+  getLoggedInUser,
+  canUserVote,
+  canUserReport,
+  isAdmin,
+} from "@/utils/auth";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +22,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      navigate("/login");
+      navigate("/");
       return;
     }
   }, [currentUser, navigate]);
@@ -73,7 +78,9 @@ const Dashboard = () => {
 
               {isAdmin(currentUser) && (
                 <Card className="p-6 space-y-4">
-                  <h2 className="text-xl font-semibold">Zarządzanie systemem</h2>
+                  <h2 className="text-xl font-semibold">
+                    Zarządzanie systemem
+                  </h2>
                   <Button
                     onClick={() => navigate("/backup-config")}
                     className="w-full"
