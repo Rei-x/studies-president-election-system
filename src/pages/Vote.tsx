@@ -7,13 +7,25 @@ import { NavigationBar } from "@/components/NavigationBar";
 import { hasUserVoted } from "@/utils/voteStorage";
 import { useToast } from "@/components/ui/use-toast";
 import { candidates } from "@/lib/candidates";
+import { getLoggedInUser, canUserVote } from "@/utils/auth";
 
 const Vote = () => {
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const currentUser = getLoggedInUser();
 
   useEffect(() => {
+    if (!currentUser || !canUserVote(currentUser)) {
+      toast({
+        title: "Brak dostępu",
+        description: "Nie masz uprawnień do głosowania.",
+        variant: "destructive",
+      });
+      navigate("/dashboard");
+      return;
+    }
+
     if (hasUserVoted()) {
       toast({
         title: "Już oddałeś głos",
@@ -22,7 +34,7 @@ const Vote = () => {
       });
       navigate("/dashboard");
     }
-  }, [navigate, toast]);
+  }, [navigate, toast, currentUser]);
 
   const handleContinue = () => {
     if (selectedCandidate) {
@@ -90,11 +102,7 @@ const Vote = () => {
                   >
                     Anuluj
                   </Button>
-                  <Button
-                    onClick={() => {
-                      handleContinue();
-                    }}
-                  >
+                  <Button onClick={handleContinue}>
                     Dalej
                   </Button>
                 </div>
