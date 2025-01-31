@@ -78,7 +78,7 @@ export default function SelectVoting({ mode }: SelectVotingProps) {
         </RadioGroup>
 
         <div className="flex justify-end gap-4 mt-8">
-          <Button variant="outline" onClick={() => navigate("/")}>
+          <Button variant="outline" onClick={() => navigate("/vote-management")}>
             Anuluj
           </Button>
           <Button
