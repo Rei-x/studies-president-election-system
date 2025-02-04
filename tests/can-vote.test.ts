@@ -11,8 +11,7 @@ import {
   users,
 } from "../src/utils/auth";
 
-// Mock localStorage
-const localStorageMock = (() => {
+const databaseMock = (() => {
   let store: { [key: string]: string } = {};
   return {
     getItem: vi.fn((key: string) => store[key] || null),
@@ -28,25 +27,26 @@ const localStorageMock = (() => {
   };
 })();
 
-// Replace global localStorage with mock
-Object.defineProperty(window, "localStorage", {
-  value: localStorageMock,
+Object.defineProperty(globalThis, "localStorage", {
+  value: databaseMock,
 });
 
 describe("User Authentication and Authorization", () => {
   beforeEach(() => {
-    localStorageMock.clear();
+    databaseMock.clear();
     vi.clearAllMocks();
   });
 
   describe("authenticateUser", () => {
     it("should return user when credentials are correct", () => {
       const result = authenticateUser("admin", "admin123");
-      expect(result).toEqual(users[5]); // Admin user
+
+      expect(result).toEqual(users[5]);
     });
 
     it("should return null when credentials are incorrect", () => {
       const result = authenticateUser("admin", "wrongpassword");
+
       expect(result).toBeNull();
     });
 
@@ -61,28 +61,32 @@ describe("User Authentication and Authorization", () => {
 
     it("should set logged in user", () => {
       setLoggedInUser(testUser);
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+
+      expect(databaseMock.setItem).toHaveBeenCalledWith(
         "currentUser",
         JSON.stringify(testUser)
       );
     });
 
     it("should get logged in user", () => {
-      localStorageMock.getItem.mockReturnValue(JSON.stringify(testUser));
+      databaseMock.getItem.mockReturnValue(JSON.stringify(testUser));
+
       const result = getLoggedInUser();
+
       expect(result).toEqual(testUser);
-      expect(localStorageMock.getItem).toHaveBeenCalledWith("currentUser");
+      expect(databaseMock.getItem).toHaveBeenCalledWith("currentUser");
     });
 
     it("should return null when no user is logged in", () => {
-      localStorageMock.getItem.mockReturnValue(null);
+      databaseMock.getItem.mockReturnValue(null);
+
       const result = getLoggedInUser();
       expect(result).toBeNull();
     });
 
     it("should clear logged in user", () => {
       clearLoggedInUser();
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith("currentUser");
+      expect(databaseMock.removeItem).toHaveBeenCalledWith("currentUser");
     });
   });
 

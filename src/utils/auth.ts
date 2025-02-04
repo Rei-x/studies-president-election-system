@@ -6,49 +6,71 @@ export interface User {
   role: "voter" | "reporter" | "admin";
 }
 
+interface UserFactory {
+  createUser(userData: Omit<User, "role">): User;
+}
+
+class VoterFactory implements UserFactory {
+  createUser(userData: Omit<User, "role">): User {
+    return { ...userData, role: "voter" };
+  }
+}
+
+class ReporterFactory implements UserFactory {
+  createUser(userData: Omit<User, "role">): User {
+    return { ...userData, role: "reporter" };
+  }
+}
+
+class AdminFactory implements UserFactory {
+  createUser(userData: Omit<User, "role">): User {
+    return { ...userData, role: "admin" };
+  }
+}
+
+export const userFactories = {
+  voter: new VoterFactory(),
+  reporter: new ReporterFactory(),
+  admin: new AdminFactory(),
+};
+
 export const users: User[] = [
-  {
+  userFactories.voter.createUser({
     id: "1",
     login: "jan.kowalski",
     password: "pass123",
     name: "Jan Kowalski",
-    role: "voter",
-  },
-  {
+  }),
+  userFactories.voter.createUser({
     id: "2",
     login: "anna.nowak",
     password: "pass123",
     name: "Anna Nowak",
-    role: "voter",
-  },
-  {
+  }),
+  userFactories.voter.createUser({
     id: "3",
     login: "piotr.wisniewski",
     password: "pass123",
     name: "Piotr Wiśniewski",
-    role: "voter",
-  },
-  {
+  }),
+  userFactories.reporter.createUser({
     id: "4",
     login: "maria.dabrowska",
     password: "pass123",
     name: "Maria Dąbrowska",
-    role: "reporter",
-  },
-  {
+  }),
+  userFactories.reporter.createUser({
     id: "5",
     login: "tomasz.lewandowski",
     password: "pass123",
     name: "Tomasz Lewandowski",
-    role: "reporter",
-  },
-  {
+  }),
+  userFactories.admin.createUser({
     id: "6",
     login: "admin",
     password: "admin123",
     name: "Administrator Systemu",
-    role: "admin",
-  },
+  }),
 ];
 
 export const authenticateUser = (
