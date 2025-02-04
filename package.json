@@ -10,7 +10,6 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "playwright test",
-    "test:vote": "vitest **/vote.test.ts",
     "docs": "npx typedoc --entryPointStrategy Expand src"
   },
   "dependencies": {
