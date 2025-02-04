@@ -18,7 +18,7 @@ export interface Voting {
   userVotes: Record<string, string>;
 }
 
-export const votings = withImmer(
+export const votingsSingletone = withImmer(
   atomWithStorage<Voting[]>("votings", [
     {
       title: "Głosowanie na prezydenta 2025",
